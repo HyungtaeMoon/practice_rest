@@ -10,6 +10,23 @@
 </head>
 <body>
     <div class="container">
+        <form action="" method="POST">
+            {% csrf_token %}
+                {% if user.is_authenticated %}
+            <button type="submit" class="btn btn-outline-dark">
+            <a href="{% url 'members:login' %}">로그인</a>
+            </button>
+
+            <button type="submit" class="btn btn-outline-warning">
+            <a href="{% url 'members:logout' %}">로그아웃하기</a>
+            </button>
+                {% else %}
+            <button type="submit" class="btn btn-outline-dark">
+                <a href="{% url 'members:login' %}">로그인</a>
+            </button>
+        </form>
+                {% endif %}
+
         {% block content %}
 
         {% endblock %}
