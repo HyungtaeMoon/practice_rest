@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <h1>Post list</h1>
     {% for post in posts %}
-        <div>{{ post }}</div>
-    {% endfor %}
+        <div>{{ post.auth }}</div>
 
+        <div>
+            <img width="100%" src="{{ post.photo.url }}" alt="">
+        </div>
+    {% endfor %}
 {% endblock %}
