@@ -9,13 +9,11 @@
     <title>Instagram</title>
 </head>
 <body>
+    <a href="{% url 'posts:post-list' %}" class="container"><h2>Instagram</h2></a>
     <div class="container">
         <form action="" method="POST">
             {% csrf_token %}
                 {% if user.is_authenticated %}
-            <button type="submit" class="btn btn-outline-dark">
-            <a href="{% url 'members:login' %}">로그인</a>
-            </button>
 
             <button type="submit" class="btn btn-outline-warning">
             <a href="{% url 'members:logout' %}">로그아웃하기</a>

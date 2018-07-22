@@ -2,9 +2,8 @@
 
 {% block content %}
 
-<h1>Post list</h1>
     {% for post in posts %}
-        <div>{{ post.auth }}</div>
+        <div>{{ post.auth }}로그인 중</div>
 
         <div>
             <img width="100%" src="{{ post.photo.url }}" alt="">
