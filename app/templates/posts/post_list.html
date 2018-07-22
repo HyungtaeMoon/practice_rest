@@ -2,9 +2,8 @@
 
 {% block content %}
 
-<h1>Post list</h1>
     {% for post in posts %}
-        <div>{{ post.auth }}</div>
+        <div>{{ post.auth }} 님이 작성</div>
 
         <div>
             <img width="100%" src="{{ post.photo.url }}" alt="">

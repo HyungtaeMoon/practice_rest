@@ -2,5 +2,6 @@
 
 {% block content %}
     <h1>Post Detail</h1>
-    <div>{{ post.photo }}</div>
+    <div>{{ post }}</div>
+    <img width="100%" src="{{ post.photo.url }}" alt="">
 {% endblock %}
