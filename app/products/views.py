@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Product
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductSubSerializer
 
 
 # @api_view(['GET', 'POST'])
@@ -44,6 +44,43 @@ class ProductList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductCopyInstance(APIView):
+    serializer_class = ProductSerializer
+
+    def get_object(self, pk):
+        try:
+            return Product.objects.get(pk=pk)
+        except Product.DoestNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        response = self.get_object(pk=pk)
+        serializer = ProductSerializer(response)
+        return Response(serializer.data)
+
+    def post(self, request, pk, format=None, **kwargs):
+        """
+        복사하여 새로운 객체를 만들어주기 때문에 POST 메서드로 사용하기 도전
+        그럼 instance=request.data 와 같이 어떤 객체인지를 먼저 알게 해줘야 할 듯
+        """
+        # 현재 해당하는 객체의 pk 가 무엇인지까지 확인
+        # kwargs 는 해당하는 딕셔너리에서 key 값만을 불러옴
+        # POST 메서드에서 data 를 불러오면 새로 입력한 값들이 들어오기 때문에 .data 는 피해야 함
+        original_data = self.kwargs.get('pk', '')
+        # 생성하려는 객체를 만들기 위해 우선 Product 모델에서 불러오기(아직 직렬화 상태 아님)
+        product = Product.objects.get(pk=original_data)
+        # 직렬화 상태(serializer) 로 만듦
+        # ProductSerializer 를 받게 되면 pk 값을 무조건 알아야 함(Meta 에 'pk' 를 명시함)
+        # 이 클래스에서 get 메서드를 통해 들어온 request.data 를 data 로 받아 직렬화
+        serializer = ProductSerializer(product, data=self.get(request.data))
+        additional_data = serializer
+        if additional_data.is_valid():
+            # save() 함수를 사용하기 위해서는 is_valid() 가 필수(아니면 에러 발생)
+            additional_data.save()
+            return Response(additional_data.data, status=status.HTTP_201_CREATED)
+        return Response(additional_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
