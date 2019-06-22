@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Product
-from .serializers import ProductSerializer, ProductSubSerializer
+from .serializers import ProductSerializer
 
 
 # @api_view(['GET', 'POST'])
@@ -64,17 +64,29 @@ class ProductCopyInstance(APIView):
         """
         복사하여 새로운 객체를 만들어주기 때문에 POST 메서드로 사용하기 도전
         그럼 instance=request.data 와 같이 어떤 객체인지를 먼저 알게 해줘야 할 듯
+
+        ### ORM CookBook 을 참고하여 아이디어를 얻음 ###
+        Product.objects.all().count() # 4
+
+        coffee = Product.objects.first()
+
+        coffee.pk = None
+
+        coffee.save()
+
+        Product.objects.all().count() # 5
         """
         # 현재 해당하는 객체의 pk 가 무엇인지까지 확인
         # kwargs 는 해당하는 딕셔너리에서 key 값만을 불러옴
         # POST 메서드에서 data 를 불러오면 새로 입력한 값들이 들어오기 때문에 .data 는 피해야 함
-        original_data = self.kwargs.get('pk', '')
+        # original_data = self.kwargs.get('pk', '')
         # 생성하려는 객체를 만들기 위해 우선 Product 모델에서 불러오기(아직 직렬화 상태 아님)
-        product = Product.objects.get(pk=original_data)
+        product = Product.objects.get(pk=pk)
+        product.pk = None
         # 직렬화 상태(serializer) 로 만듦
-        # ProductSerializer 를 받게 되면 pk 값을 무조건 알아야 함(Meta 에 'pk' 를 명시함)
         # 이 클래스에서 get 메서드를 통해 들어온 request.data 를 data 로 받아 직렬화
-        serializer = ProductSerializer(product, data=self.get(request.data))
+        # 매직메서드 __dict__ 의 사용방법은 느낌적으로 옳지 않은 것 같지만 일단은 구현을 위해 사용
+        serializer = ProductSerializer(product, data=product.__dict__)
         additional_data = serializer
         if additional_data.is_valid():
             # save() 함수를 사용하기 위해서는 is_valid() 가 필수(아니면 에러 발생)
